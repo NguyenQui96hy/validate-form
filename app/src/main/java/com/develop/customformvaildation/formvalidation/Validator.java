@@ -7,19 +7,29 @@ import android.util.Patterns;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import com.develop.customformvaildation.R;
 import com.develop.customformvaildation.utils.Logger;
 
 import java.util.regex.Pattern;
 
+import static android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+import static android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD;
+
 public class Validator implements IValidationForm {
     private ViewGroup viewGroup;
     private Context context;
+    private IValidationFormResultListeners iValidationFormResultListeners;
 
     public Validator(ViewGroup viewGroup, Context context) {
         this.viewGroup = viewGroup;
         this.context = context;
+    }
+
+    public Validator(ViewGroup viewGroup, Context context, IValidationFormResultListeners iValidationFormResultListeners) {
+        this.viewGroup = viewGroup;
+        this.context = context;
+        this.iValidationFormResultListeners = iValidationFormResultListeners;
     }
 
     public void validate() {
@@ -40,15 +50,32 @@ public class Validator implements IValidationForm {
      */
     private void checkInputType(EditText editText) {
         String content = editText.getText().toString();
+        int idForm = editText.getId();
+        Logger.e(editText.getId() + " id");
         switch (editText.getInputType()) {
             case InputType.TYPE_CLASS_PHONE:
                 if (!isValidPhone(content)) {
-                    Toast.makeText(context, "Phone Error", Toast.LENGTH_LONG).show();
+                    Logger.e("invalid Phone");
+                    editText.setError(getResourcesString(R.string.msg_phone_error));
+                    if (null != iValidationFormResultListeners) {
+                        iValidationFormResultListeners.onResult(idForm);
+                    }
                 }
                 break;
-            case InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS:
+            case InputType.TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS:
                 if (!isValidEmail(content)) {
-                    Toast.makeText(context, "Email Error", Toast.LENGTH_LONG).show();
+                    editText.setError(getResourcesString(R.string.msg_email_error));
+                    if (null != iValidationFormResultListeners) {
+                        iValidationFormResultListeners.onResult(idForm);
+                    }
+                }
+                break;
+            case InputType.TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_PASSWORD:
+                if (!isValidPassWord(content)) {
+                    editText.setError(getResourcesString(R.string.msg_pass_word));
+                    if (null != iValidationFormResultListeners) {
+                        iValidationFormResultListeners.onResult(idForm);
+                    }
                 }
                 break;
             default:
@@ -64,7 +91,7 @@ public class Validator implements IValidationForm {
 
     @Override
     public boolean isValidEmail(String data) {
-        return !TextUtils.isEmpty(data) && Patterns.EMAIL_ADDRESS.matcher(data).matches();
+        return (!TextUtils.isEmpty(data) && Patterns.EMAIL_ADDRESS.matcher(data).matches());
     }
 
     @Override
@@ -73,6 +100,10 @@ public class Validator implements IValidationForm {
                 = Pattern.compile(
                 "[a-zA-Z0-9\\!\\@\\#\\$]{8,24}");
 
-        return !TextUtils.isEmpty(data) && PASSWORD_PATTERN.matcher(data).matches();
+        return (!TextUtils.isEmpty(data) && PASSWORD_PATTERN.matcher(data).matches());
+    }
+
+    private String getResourcesString(int id) {
+        return context.getResources().getString(id);
     }
 }
