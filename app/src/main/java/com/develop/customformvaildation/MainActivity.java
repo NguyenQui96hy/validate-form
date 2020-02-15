@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.develop.customformvaildation.formvalidation.IValidationFormResultListeners;
 import com.develop.customformvaildation.formvalidation.Validator;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,13 +19,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        viewGroup= findViewById(R.id.viewGroup);
-
-
+        viewGroup = findViewById(R.id.viewGroup);
     }
 
     public void onClickLister(View view) {
         Validator validator = new Validator(viewGroup, getApplicationContext());
+        // or
+//        Validator validator1 = new Validator(viewGroup, getApplicationContext(), new IValidationFormResultListeners() {
+//            @Override
+//            public void onResult(int formID) {
+//
+//            }
+//        });
         validator.validate();
     }
 }
