@@ -34,12 +34,14 @@ public class Validator implements IValidationForm {
 
     public void validate() {
         if (null != viewGroup) {
+            boolean isvalidForm = true;
             for (int i = 0, count = viewGroup.getChildCount(); i < count; ++i) {
                 View view = viewGroup.getChildAt(i);
                 if (view instanceof EditText) {
-                    checkInputType((EditText) view);
+                    isvalidForm = checkInValidForm((EditText) view);
                 }
             }
+            iValidationFormResultListeners.onResult(isvalidForm);
         }
     }
 
@@ -48,39 +50,34 @@ public class Validator implements IValidationForm {
      *
      * @param editText
      */
-    private void checkInputType(EditText editText) {
+    private boolean checkInValidForm(EditText editText) {
         String content = editText.getText().toString();
-        int idForm = editText.getId();
+        boolean isValid = true;
         Logger.e(editText.getId() + " id");
         switch (editText.getInputType()) {
             case InputType.TYPE_CLASS_PHONE:
                 if (!isValidPhone(content)) {
                     Logger.e("invalid Phone");
                     editText.setError(getResourcesString(R.string.msg_phone_error));
-                    if (null != iValidationFormResultListeners) {
-                        iValidationFormResultListeners.onResult(idForm);
-                    }
+                    isValid = false;
                 }
                 break;
             case InputType.TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS:
                 if (!isValidEmail(content)) {
                     editText.setError(getResourcesString(R.string.msg_email_error));
-                    if (null != iValidationFormResultListeners) {
-                        iValidationFormResultListeners.onResult(idForm);
-                    }
+                    isValid = false;
                 }
                 break;
             case InputType.TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_PASSWORD:
                 if (!isValidPassWord(content)) {
                     editText.setError(getResourcesString(R.string.msg_pass_word));
-                    if (null != iValidationFormResultListeners) {
-                        iValidationFormResultListeners.onResult(idForm);
-                    }
+                    isValid = false;
                 }
                 break;
             default:
 
         }
+        return isValid;
     }
 
 

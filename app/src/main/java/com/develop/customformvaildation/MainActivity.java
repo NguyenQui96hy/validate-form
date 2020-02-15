@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.develop.customformvaildation.formvalidation.IValidationFormResultListeners;
 import com.develop.customformvaildation.formvalidation.Validator;
+import com.develop.customformvaildation.utils.Logger;
 
 public class MainActivity extends AppCompatActivity {
     private ViewGroup viewGroup;
@@ -25,12 +26,17 @@ public class MainActivity extends AppCompatActivity {
     public void onClickLister(View view) {
         Validator validator = new Validator(viewGroup, getApplicationContext());
         // or
-//        Validator validator1 = new Validator(viewGroup, getApplicationContext(), new IValidationFormResultListeners() {
-//            @Override
-//            public void onResult(int formID) {
-//
-//            }
-//        });
-        validator.validate();
+        Validator validator1 = new Validator(viewGroup, getApplicationContext(), new IValidationFormResultListeners() {
+
+            @Override
+            public void onResult(boolean isValid) {
+                if (isValid) {
+                    Logger.e("isValid ---Thanh cong");
+                } else {
+                    Logger.e("isValid ---That bai");
+                }
+            }
+        });
+        validator1.validate();
     }
 }
